@@ -1,0 +1,71 @@
+% PROGRAMA
+% CORRELACION CRUZADA ONI - TSM
+%
+clear all, close all, clc
+%
+% Lectura los datos de ONI.
+% Inicio = 1993-01 , Termino = 2018-12
+%
+ONI = importdata('INDICEONI.nino34.dat');
+UONI = ONI.data(:,5); % la componente U
+%
+% Lectura de los datos de TSM.
+% Datos de corrientes medidos a la profundidad de 5
+% Inicio = 1993-01 , Termino = 2018-12
+%
+TSM = importdata('BOYA_08_COPERNICUS_TSM_PACIFICO.dat'); %se cargan
+%los datos de TSM
+UTSM = TSM.data(:,3); % la componente U
+
+n = length(UTSM); % para determinar la cantidad de datos
+tiempo = 1 : n; % se genera el vector tiempo
+
+
+figure('Units', 'Normalized',...
+'Position',[0.1 0.13 0.6 0.35],...
+'PaperPositionMode','auto',...
+'color','w')
+axes('position',[0.1 0.2 0.8 0.7])
+[ax,h1,h2] = plotyy(tiempo,UONI,tiempo,UTSM);
+set(ax,'ycolor','k','fontsize',15,'tickdir','out','xlim',[0 250])
+set(h1,'linewidth',2,'color','b')
+set(h2,'linewidth',2,'color','r')
+set(get(ax(1),'Ylabel'),'string','ONI ()','fontsize',15)
+set(get(ax(2),'Ylabel'),'string','TSM (°C)','fontsize',15)
+set(get(ax(1),'Xlabel'),'string','Tiempo (Meses)','fontsize',15)
+legend('ONI (U)','TSM (U)')
+
+% print -dpng EJEMPLO_2_13a %para generar figuras en formato png
+
+X = detrend(UTSM);
+Y = detrend(UONI);;
+[r,k] = xcorr(X,Y,100,'coeff');
+
+figure('Units', 'Normalized',...
+'Position',[0.1 0.13 0.7 0.35],...
+'PaperPositionMode','auto',...
+'color','w')
+plot(k,r,'-','linewidth',2)
+xlabel('Retardo (Meses)','fontsize',15)
+ylabel('Correlación','fontsize',15)
+set(gca,'fontsize',15)
+grid
+% print -dpng EJEMPLO_2_13b %para generar figuras en formato png
+
+% MM viene de la autocorrelación de ONI y TSM.
+% es cuando la función cruza por cero
+MM = 15;
+gl = length(UONI)/MM;
+ro = (1/(gl))^0.5;
+r95 = 2.6*ro;
+figure('Units', 'Normalized',...
+'Position',[0.1 0.13 0.7 0.35],...
+'PaperPositionMode','auto',...
+'color','w')
+plot(k,r,'x','linewidth',2)
+xlabel('Retardo (Meses)','fontsize',15)
+ylabel('Correlación','fontsize',15)
+set(gca,'fontsize',15)
+grid
+hold on
+plot(k,r95*(ones(length(k),1)),'r');
