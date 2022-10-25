@@ -1,0 +1,51 @@
+%BOXPLOT
+
+% PROGRAMA:
+% EJEMPLO_2_06.m
+% Lee los datos
+clear all, close all, clc
+path = 'C:\ANALISIS TMV\';
+file = [path 'vientos. dat'];
+DATA = load('vientos.dat');
+X = DATA(:,4);
+% Calcula el promedio climatologico cada 6 horas.
+hora = [];
+data = [];
+for k=0:3:24
+    ix= find (DATA(:,2)==k); 
+    if isempty (ix)==0
+        data = [data, DATA(ix,4)*0.518];
+        hora=[hora, k];
+    end
+end
+[n,m]=size(data);
+
+HORA = [num2str(hora') repmat(' Hr',m,1)];
+
+color = [0.8 0.8 0.8];
+figure('Units', 'Normalized','Position',[0.1 0.13 0.7 0.4],'PaperPositionMode','auto','color','w')
+
+h= boxplot (axes, data,'Widths',0.25);
+for k=1:m
+    set(h(1,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(2,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(3,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(4,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(5,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(6,k),'linestyle','-','linewidth',2,'color','k')
+    set(h(7,k),'marker','o','markersize',8,'markeredgecolor','k','markerfacecolor','k','markerfacecolor',color)
+    xdata = get(h(5,k),'xdata');
+    ydata = get(h(5,k),'ydata');
+    mediana = get(h(6,k),'ydata');
+    hold on
+    H=fill(xdata,ydata,color);
+    set(H,'LineWidth',2)
+    hold on
+    plot([xdata(1) xdata(3)],[mediana(1) mediana(1)],'-k','linewidth',2)
+end
+set(gca,'xtick',[1:8],'xticklabel',HORA,'fontsize',15,...
+'ylim',[-1 20],'ytick',[0:5:20],'box','off',...
+'tickdir','out','ticklength',[0.025 0.3])
+ylabel('Magnitud (m/s)','fontsize',18)
+
+print -dpng EJEMPLO_2_06
