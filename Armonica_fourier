@@ -1,0 +1,26 @@
+% espectro de welch
+clear all
+close all
+clear clf
+clc
+data = importdata('tumaco71.dat');
+x = data;
+x = detrend(x);
+Nobs = length(x);
+t = [1:Nobs]';
+M = 10; %numero de segmentos
+L = fix(Nobs/M);
+ventana = 'hamming';
+INFO = spectrum.welch(ventana,L,50); %0 = sin solapar
+H = psd(INFO,x,'Fs',1,'ConfLevel',0.95);
+PxxW = H.Data;
+FreqW = H.Frequencies;
+INT = H.ConfInterval;
+INT1 = INT(:,1);
+INT2 = INT(:,2);
+figure
+loglog(FreqW(2:end),PxxW(2:end),'color','k','linewidth',1.5)
+figure
+plot(FreqW(2:end),PxxW(2:end),'color','m','linewidth',1.5)
+figure
+semilogy(FreqW(2:end),PxxW(2:end),'color','k','linewidth',1.5)
