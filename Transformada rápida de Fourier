@@ -1,0 +1,48 @@
+clear all
+close all
+clear clf
+clc
+dy = 1/12;
+yi = 1993;
+ye = 2019;
+X = yi:dy:ye-dy;
+X = X';
+data = importdata('BOYA_08_COPERNICUS_NIVEL_DEL_MAR_PACIFICO.dat');
+YO = data.data (: , 3);
+YO = detrend(YO);
+N = length(YO);
+M = N/2;
+t = [1:N]';
+f0 = 1/N;
+fN = M/N;
+for k = 0:M;
+ak(k+1) = (2/N)*sum(YO.*cos(t*2*pi*f0*k));
+bk(k+1) = (2/N)*sum(YO.*sin(t*2*pi*f0*k));
+end
+
+ak(1) = ak(1)/2;
+ak(end) = ak(end)/2;
+bk(end) = 0;
+ck = sqrt(ak.*ak + bk.*bk);
+fk = atan2(bk,ak)*180/pi;
+freq = [f0:f0:fN]';
+figure
+plot(X,YO,'color','b','linewidth',1.5)
+figure
+plot(freq,ck(2:end),'color','r','linewidth',1.5)
+% calculo de la transormada de fourier
+Y = fft(YO);
+Modulo = abs(Y);
+SOL = Modulo(1:M);
+figure
+plot(freq,SOL,'color','m','linewidth',1.5)
+
+% cálculo de la transformada discreta completa
+w = 2*pi/N;
+for k = 0:N-1
+wk = w*k;
+SUMA = sum(YO.*exp(-j*wk*t));
+XW(k+1,1) = SUMA;
+end
+figure
+plot(freq, abs(XW(1:M)),'color','k','linewidth',1.5)
