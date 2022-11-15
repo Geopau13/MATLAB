@@ -1,0 +1,37 @@
+clear all, close all, clc
+%--- carga los datos
+datos = importdata('BOYA_08_COPERNICUS_NIVEL_DEL_MAR_PACIFICO.dat');
+fec = datos.data(:,1)
+hor = datos.data(:,2);
+U = datos.data(:,3);
+
+Nobs = length(U);
+
+figure('Units', 'Normalized',...
+'Position',[0.1 0.13 0.6 0.4],...
+'PaperPositionMode','auto',...
+'color','w')
+plot(U,'b','linewidth',1)
+ylabel('nivel del mar (M))','fontsize',15)
+xlabel('Meses','fontsize',15)
+set(gca,'fontsize',15,'xlim',[0 310],'xtick',[0:200:1200],...
+'ticklength',[0.02
+3],'xminortick','on','yminortick','on',...
+'ylim',[-10 10],'ytick',[-10:5:10])
+%print -dpng EJEMPLO_2_24a
+
+% Eliminamos las frecuencias de nuestra serie de tiempo
+% con periodo de corte MAYORES a 24 horas.
+T = 14;
+M = 300;
+wc = 2*pi/T;
+wn = wc/pi;
+h2 = fir1(M,wn,'high');
+Nh2 = length(h2);
+X_filtrado2 = filtra(U,h2);
+
+% Compara las dos series real y filtrada high pass
+figure('Units', 'Normalized',...
+'Position',[0.1 0.13 0.4 0.4],...
+'PaperPositionMode','auto',...
+'color','w')
